@@ -31,4 +31,13 @@
   .login-button:hover {
     background-color: #1ED760;
   }
+
+  .room-input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 200px;
+    box-sizing: border-box;
+  }
   
