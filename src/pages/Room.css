@@ -1,0 +1,146 @@
+.room-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to bottom, #1DB954, #191414);
+}
+
+.room-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 32px;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.add-song-input {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.add-song-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #1DB954;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 50px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+
+.add-song-button:hover {
+  background-color: #1ED760;
+}
+
+.add-song-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  /* background-color: #1a1a1a; */
+  border-radius: 10px;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
+  margin-bottom: 10px;
+}
+
+.song-queue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  overflow-y: auto;
+  max-height: 200px;
+  scrollbar-width: thin;
+  scrollbar-color: #1DB954 #282828;
+}
+
+.song-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #282828;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.current-song {
+  display: flex;
+  flex-direction: column; /* Updated from row to column */
+  align-items: flex-start; /* Align items to the start of the flex-direction */
+  background-color: #282828;
+  border-radius: 8px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.current-song-info {
+  display: flex;
+  align-items: center;
+  width: 100%; /* Ensure the info takes full width */
+}
+
+.current-song-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 16px;
+}
+
+.current-song-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.current-song-artists {
+  font-size: 14px;
+  color: #c7c7c7;
+}
+
+.current-song-loading {
+  color: white;
+  text-align: center;
+}
+
+.current-song-progress-bar {
+  width: 100%; /* Full width of the container */
+  height: 4px; /* Set the desired height for the progress bar */
+  background-color: #535353; /* Background of the unplayed part */
+  border-radius: 2px; /* Optional: round corners for the bar */
+  margin-top: 16px; /* Space between song info and progress bar */
+  position: relative; /* Position relative for inner bar placement */
+}
+
+.current-song-progress {
+  height: 4px; /* Match the height of the progress bar */
+  background-color: #1db954; /* Color for the played part */
+  border-radius: 2px; /* Match the border radius of the progress bar */
+  width: 0%; /* Initial width, should be updated with inline styles based on progress */
+  position: absolute; /* Absolute position within the progress bar */
+  top: 0; /* Align to the top of the progress bar */
+  left: 0; /* Align to the left of the progress bar */
+}
+
+

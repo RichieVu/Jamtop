@@ -1,9 +1,23 @@
 const express = require("express");
+const app = express();
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 const request = require("request");
 const dotenv = require("dotenv");
 
-const port = 5000;
+app.use(cors());
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+// Spotify API setup
+const port = 5000;
 global.access_token = "";
 
 dotenv.config();
@@ -14,25 +28,6 @@ var spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 var spotify_redirect_uri = "http://localhost:3000/auth/callback";
 
 var generateRandomString = function (length) {
-  const express = require("express");
-  const http = require("http");
-  const socketIo = require("socket.io");
-  const request = require("request");
-  const dotenv = require("dotenv");
-
-  const port = 5000;
-
-  global.access_token = "";
-
-  dotenv.config();
-
-  // ... (other code remains the same)
-
-  var app = express();
-  var server = http.createServer(app); // Create an HTTP server for socket.io
-  var io = socketIo(server); // Initialize socket.io
-
-  // ... (remaining code)
   var text = "";
   var possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -43,10 +38,25 @@ var generateRandomString = function (length) {
   return text;
 };
 
-var app = express();
+// Socket.IO room handling
+io.on("connection", (socket) => {
+  console.log(`user connected: ${socket.id}`);
+  socket.on("disconnect", () => {
+    console.log(`user disconnected: ${socket.id}`);
+  });
+
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+  });
+});
 
 app.get("/auth/login", (req, res) => {
-  var scope = "streaming user-read-email user-read-private";
+  var scope =
+    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state";
   var state = generateRandomString(16);
 
   var auth_query_parameters = new URLSearchParams({
@@ -96,6 +106,6 @@ app.get("/auth/token", (req, res) => {
   res.json({ access_token: access_token });
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
