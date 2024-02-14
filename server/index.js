@@ -38,21 +38,43 @@ var generateRandomString = function (length) {
   return text;
 };
 
+let hostSocketId = null;
+
 // Socket.IO room handling
 io.on("connection", (socket) => {
   console.log(`user connected: ${socket.id}`);
+
   socket.on("disconnect", () => {
     console.log(`user disconnected: ${socket.id}`);
+    if (socket.id === hostSocketId) {
+      hostSocketId = null;
+      io.emit("host_changed", { newHostId: getNewHostId() });
+    }
   });
 
-  socket.on("send_message", (data) => {
-    socket.to(data.room).emit("receive_message", data);
+  socket.on("join_room", (room) => {
+    socket.join(room);
+    if (hostSocketId === null) {
+      hostSocketId = socket.id;
+    }
+    io.in(room).emit("host_designated", { hostId: hostSocketId });
   });
 
-  socket.on("join_room", (data) => {
-    socket.join(data);
+  socket.on("request_sync_data", () => {
+    // If you are the host and you are not the one requesting the data
+    if (socket.id === hostSocketId) {
+      socket.emit("get_sync_data"); // Send the request to the host
+    }
   });
 });
+
+// Function to get the new host ID when the current host disconnects
+function getNewHostId() {
+  const connectedSocketIds = Object.keys(io.sockets.sockets);
+  const currentHostIndex = connectedSocketIds.indexOf(hostSocketId);
+  const nextHostIndex = (currentHostIndex + 1) % connectedSocketIds.length;
+  return connectedSocketIds[nextHostIndex];
+}
 
 app.get("/auth/login", (req, res) => {
   var scope =
