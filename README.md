@@ -2,8 +2,7 @@
 
 Jamtop is brings the Spotify Jam functionality to desktop. Users can host their own room and listen to along with friends. Join a synchronized playlist where everyone can add their own songs.
 
-![]
-(https://github.com/RichieVu/Jamtop/blob/master/public/host_demo.gif)
+![Host Demo](public/host_demo.gif)
 
 ## MoSCoW
 
