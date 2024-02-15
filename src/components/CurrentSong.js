@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../pages/Room.css"; // Ensure the CSS file name is correct
+import { useSocket } from "../SocketContext";
 
-function CurrentSong({ token }) {
+function CurrentSong({ token, roomCode }) {
+  const socket = useSocket();
   const [currentSong, setCurrentSong] = useState(null);
   const [progress, setProgress] = useState(0);
 
@@ -21,6 +23,7 @@ function CurrentSong({ token }) {
           const data = await response.json();
           setCurrentSong(data.item);
           setProgress((data.progress_ms / data.item.duration_ms) * 100);
+          console.log("Current song fetched:", data.item);
         } else {
           console.error("Failed to fetch current song");
         }
@@ -35,9 +38,18 @@ function CurrentSong({ token }) {
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [token]);
 
+  useEffect(() => {
+    socket.on("supply_sync_current_song", () => {
+      socket.emit("host_sync_current_song", {
+        currentSong: currentSong,
+        roomCode,
+      });
+      console.log("Current song emitted:", currentSong);
+    });
+  }, [socket]);
+
   if (!currentSong)
     return <div className="current-song-loading">Loading current song...</div>;
-
   return (
     <div className="current-song">
       <div className="current-song-info">

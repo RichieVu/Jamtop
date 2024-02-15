@@ -24,6 +24,7 @@ function AddSong({ token, fetchQueue }) {
         console.log("Song added to queue");
         fetchQueue(); // Refresh the queue after adding a song
         setSpotifySongLink("");
+        console.log("Token", token);
       } else {
         console.error("Failed to add song to queue");
       }

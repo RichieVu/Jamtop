@@ -5,6 +5,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const request = require("request");
 const dotenv = require("dotenv");
+const session = require("express-session");
 
 app.use(cors());
 
@@ -16,10 +17,17 @@ const io = new Server(server, {
   },
 });
 
+// Configure express-session middleware
+app.use(
+  session({
+    secret: "secret-key",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // Spotify API setup
 const port = 5000;
-global.access_token = "";
-
 dotenv.config();
 
 var spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
@@ -60,11 +68,21 @@ io.on("connection", (socket) => {
     io.in(room).emit("host_designated", { hostId: hostSocketId });
   });
 
-  socket.on("request_sync_data", () => {
-    // If you are the host and you are not the one requesting the data
-    if (socket.id === hostSocketId) {
-      socket.emit("get_sync_data"); // Send the request to the host
+  socket.on("get_sync_data", (roomCode) => {
+    if (hostSocketId) {
+      socket.to(hostSocketId).emit("supply_sync_queue");
+      socket.to(hostSocketId).emit("supply_sync_current_song");
     }
+  });
+
+  socket.on("host_sync_queue", (data) => {
+    console.log("host_sync_queue", data.queue);
+    socket.to(data.roomCode).emit("end_sync_queue", data);
+  });
+
+  socket.on("host_sync_current_song", (data) => {
+    console.log("host_sync_current_song", data.currentSong);
+    socket.to(data.roomCode).emit("end_sync_current_song", data);
   });
 });
 
@@ -78,7 +96,7 @@ function getNewHostId() {
 
 app.get("/auth/login", (req, res) => {
   var scope =
-    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state";
+    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state user-read-currently-playing";
   var state = generateRandomString(16);
 
   var auth_query_parameters = new URLSearchParams({
@@ -118,14 +136,16 @@ app.get("/auth/callback", (req, res) => {
 
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      access_token = body.access_token;
+      // Store access token in session
+      req.session.access_token = body.access_token;
       res.redirect("/");
     }
   });
 });
 
 app.get("/auth/token", (req, res) => {
-  res.json({ access_token: access_token });
+  // Retrieve access token from session
+  res.json({ access_token: req.session.access_token });
 });
 
 server.listen(port, () => {

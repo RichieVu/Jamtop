@@ -10,16 +10,18 @@ import { SocketProvider } from "./SocketContext";
 function App() {
   const [token, setToken] = useState("");
   useEffect(() => {
+    console.log("rendered");
     async function getToken() {
       const response = await fetch("/auth/token");
       const json = await response.json();
+      console.log("Token response:", json); // Added console.log statement for debugging
       setToken(json.access_token);
     }
 
     getToken();
   }, []);
 
-  if (token === "") {
+  if (token === "" || !token) {
     return <Login />;
   } else {
     return (
